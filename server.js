@@ -17,13 +17,13 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/cycle_boo
 }).catch(err => console.error(err));
 
 // Register your route handlers
-app.use('/api/login', require('./login.js'));
-app.use('/api/register', require('./register.js'));
-app.use('/api/book', require('./book.js'));
-app.use('/api/bookings', require('./bookings.js'));
-app.use('/api/start-ride', require('./start-ride.js'));
-app.use('/api/stop-ride', require('./stop-ride.js'));
-app.use('/api/ride-history', require('./ride-history.js'));
+app.use('/api/login', require('./api/login.js'));
+app.use('/api/register', require('./api/register.js'));
+app.use('/api/book', require('./api/book.js'));
+app.use('/api/bookings', require('./api/bookings.js'));
+app.use('/api/start-ride', require('./api/start-ride.js'));
+app.use('/api/stop-ride', require('./api/stop-ride.js'));
+app.use('/api/ride-history', require('./api/ride-history.js'));
 
 // Start the server
 const PORT = process.env.PORT || 5000;
