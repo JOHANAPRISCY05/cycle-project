@@ -1,12 +1,12 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const { User } = require('./models.js');
+const { User, connectDB } = require('./models.js');
 
 module.exports = async function (req, res) {
   if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
 
-  const { email, password, role } = req.body;
   try {
+    await connectDB();
+    const { email, password, role } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
 

@@ -1,16 +1,20 @@
-const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const { Booking } = require('./models.js');
+const { Booking, connectDB } = require('./models.js');
 
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ message: 'No token provided' });
 
-  jwt.verify(token, process.env.JWT_SECRET || 'secret_key', (err, user) => {
-    if (err) return res.status(403).json({ message: 'Invalid token' });
-    req.user = user;
-    next();
-  });
+  try {
+    await connectDB();
+    jwt.verify(token, process.env.JWT_SECRET || 'secret_key', (err, user) => {
+      if (err) return res.status(403).json({ message: 'Invalid token' });
+      req.user = user;
+      next();
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 module.exports = async function (req, res) {
@@ -19,8 +23,9 @@ module.exports = async function (req, res) {
   authenticateToken(req, res, async () => {
     if (req.user.role !== 'host') return res.status(403).json({ message: 'Unauthorized' });
 
-    const { bookingId, uniqueCode } = req.body;
     try {
+      await connectDB();
+      const { bookingId, uniqueCode } = req.body;
       const booking = await Booking.findById(bookingId);
       if (!booking || booking.uniqueCode !== uniqueCode) return res.status(400).json({ message: 'Invalid booking or code' });
       if (booking.started) return res.status(400).json({ message: 'Ride already started' });

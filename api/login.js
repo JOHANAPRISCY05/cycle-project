@@ -1,13 +1,13 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { User } = require('./models.js');
+const { User, connectDB } = require('./models.js');
 
 module.exports = async function (req, res) {
   if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
 
-  const { email, password, role } = req.body;
   try {
+    await connectDB();
+    const { email, password, role } = req.body;
     const user = await User.findOne({ email, role });
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
