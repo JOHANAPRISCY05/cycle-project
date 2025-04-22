@@ -1,32 +1,6 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/cycle_booking', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).catch(err => console.error(err));
-
-const UserSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ['user', 'host'], required: true }
-});
-const User = mongoose.model('User', UserSchema, 'users');
-
-const BookingSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  place: String,
-  cycle: String,
-  uniqueCode: String,
-  started: { type: Boolean, default: false },
-  stopped: { type: Boolean, default: false },
-  startTime: Date,
-  endTime: Date,
-  duration: Number,
-  cost: Number,
-  dropLocation: String
-});
-const Booking = mongoose.model('Booking', BookingSchema, 'bookings');
+const { User, Booking } = require('./models.js');
 
 const authenticateToken = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -39,7 +13,7 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-export default async function handler(req, res) {
+module.exports = async function (req, res) {
   if (req.method !== 'GET') return res.status(405).json({ message: 'Method not allowed' });
 
   authenticateToken(req, res, async () => {
@@ -52,4 +26,4 @@ export default async function handler(req, res) {
       res.status(500).json({ message: 'Server error' });
     }
   });
-}
+};

@@ -1,19 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { User } = require('./models.js');
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/cycle_booking', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).catch(err => console.error(err));
-
-const UserSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ['user', 'host'], required: true }
-});
-const User = mongoose.model('User', UserSchema, 'users');
-
-export default async function handler(req, res) {
+module.exports = async function (req, res) {
   if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
 
   const { email, password, role } = req.body;
@@ -27,6 +16,7 @@ export default async function handler(req, res) {
 
     res.status(201).json({ message: 'User registered successfully' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
-}
+};
